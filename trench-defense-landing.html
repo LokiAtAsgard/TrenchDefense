@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WW1-Trench Defense — Hold the Line</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Barlow+Condensed:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    /* ── DESIGN TOKENS ─────────────────────────────────────── */
+    :root {
+      --mud: #1a1610;
+      --trench: #2a241c;
+      --dusk: #3d3528;
+      --khaki: #8b7355;
+      --sand: #c4a87a;
+      --brass: #d4a843;
+      --rust: #8b3a1e;
+      --smoke: #b8b0a0;
+      --mist: #e8e2d8;
+      --white: #f5f0e8;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-cond: 'Barlow Condensed', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --transition: 180ms ease;
+    }
+
+    /* ── RESET ─────────────────────────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--mud);
+      color: var(--mist);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: var(--sand);
+    }
+
+    button {
+      cursor: pointer;
+      font-family: var(--font-body);
+      border: none;
+      background: none;
+    }
+
+    /* ── UTILITY ───────────────────────────────────────────── */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      clip: rect(0, 0, 0, 0);
+      overflow: hidden;
+    }
+
+    .eyebrow {
+      font-family: var(--font-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 52px);
+      line-height: 1;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+
+    .divider {
+      width: 48px;
+      height: 2px;
+      background: var(--brass);
+      margin: 0.75rem 0 1.5rem;
+    }
+
+    .prose {
+      color: var(--smoke);
+      line-height: 1.75;
+    }
+
+    .prose p {
+      margin-bottom: 1rem;
+    }
+
+    .prose p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      /* 
+        1) Subtle dark overlay for text readability, blending into the body's mud color at the bottom
+        2) Background image is responsive, centered, and covers the section
+      */
+      background:
+        linear-gradient(180deg, rgba(26, 22, 16, 0.5) 0%, rgba(26, 22, 16, 0.7) 70%, #1a1610 100%),
+        url('trench-bg.jpg') center/cover no-repeat;
+      background-color: #2a2218;
+    }
+
+    /* SVG barbed-wire horizon: the page's signature element */
+    .hero-wire {
+      position: absolute;
+      bottom: 38%;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      opacity: 0.35;
+    }
+
+    .hero-silhouette {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      padding: 3rem 2rem 3.5rem;
+    }
+
+    .hero-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(139, 58, 30, .3);
+      border: 1px solid var(--rust);
+      border-radius: var(--radius-sm);
+      padding: 3px 10px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #e07050;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #e07050;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(56px, 10vw, 110px);
+      line-height: 0.92;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-title span {
+      color: var(--brass);
+    }
+
+    .hero-tagline {
+      font-family: var(--font-cond);
+      font-size: clamp(16px, 2.5vw, 22px);
+      font-weight: 500;
+      color: var(--sand);
+      letter-spacing: 0.04em;
+      margin-bottom: 2rem;
+      max-width: 520px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brass);
+      color: var(--mud);
+      font-family: var(--font-cond);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: var(--sand);
+      color: var(--mud);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--smoke);
+      font-family: var(--font-cond);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 13px 24px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(184, 176, 160, .3);
+      transition: var(--transition);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--sand);
+      color: var(--sand);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 2rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.45;
+    }
+
+    .hero-scroll span {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--smoke);
+      writing-mode: vertical-rl;
+    }
+
+    .hero-scroll i {
+      font-size: 18px;
+      color: var(--smoke);
+      animation: bob 2s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(4px)
+      }
+    }
+
+    /* ── NAV ───────────────────────────────────────────────── */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(26, 22, 16, .95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(139, 115, 85, .25);
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-inner::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-tab {
+      flex-shrink: 0;
+      padding: 14px 18px;
+      font-family: var(--font-cond);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--khaki);
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      color: var(--sand);
+    }
+
+    .nav-tab.active {
+      color: var(--brass);
+      border-bottom-color: var(--brass);
+    }
+
+    /* ── LAYOUT SHELL ──────────────────────────────────────── */
+    .page-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 2.5rem;
+      align-items: start;
+      margin-top: 3.5rem;
+    }
+
+    .main-col {
+      min-width: 0;
+    }
+
+    .side-col {
+      position: sticky;
+      top: 56px;
+    }
+
+    /* ── SECTION SPACING ───────────────────────────────────── */
+    .section {
+      padding: 3.5rem 0;
+      border-bottom: 1px solid rgba(139, 115, 85, .15);
+    }
+
+    .section:last-child {
+      border-bottom: none;
+    }
+
+    /* ── ABOUT ─────────────────────────────────────────────── */
+    .lore-block {
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .2);
+      border-left: 3px solid var(--brass);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .lore-block blockquote {
+      font-style: italic;
+      color: var(--sand);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 1.5rem;
+    }
+
+    .tag {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(139, 115, 85, .35);
+      color: var(--khaki);
+      background: rgba(139, 115, 85, .08);
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: var(--trench);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-top: 2rem;
+      border: 1px solid rgba(139, 115, 85, .2);
+    }
+
+    .video-frame-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--khaki);
+    }
+
+    .play-btn-large {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(212, 168, 67, .15);
+      border: 2px solid var(--brass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--brass);
+      transition: var(--transition);
+    }
+
+    .play-btn-large:hover {
+      background: rgba(212, 168, 67, .25);
+      transform: scale(1.05);
+    }
+
+    .video-label {
+      font-family: var(--font-cond);
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── MECHANICS ─────────────────────────────────────────── */
+    .accordion-item {
+      border: 1px solid rgba(139, 115, 85, .18);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .accordion-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: var(--trench);
+      text-align: left;
+      transition: background var(--transition);
+    }
+
+    .accordion-trigger:hover {
+      background: var(--dusk);
+    }
+
+    .accordion-trigger.open {
+      background: var(--dusk);
+    }
+
+    .acc-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: rgba(212, 168, 67, .12);
+      border: 1px solid rgba(212, 168, 67, .25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--brass);
+      flex-shrink: 0;
+    }
+
+    .acc-title {
+      flex: 1;
+      font-family: var(--font-cond);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
+
+    .acc-chevron {
+      font-size: 18px;
+      color: var(--khaki);
+      transition: transform var(--transition);
+      flex-shrink: 0;
+    }
+
+    .accordion-trigger.open .acc-chevron {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 0 20px 20px;
+      background: rgba(42, 36, 28, .5);
+      color: var(--smoke);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .accordion-body.open {
+      display: block;
+    }
+
+    .accordion-body .prose {
+      padding-top: 16px;
+      border-top: 1px solid rgba(139, 115, 85, .12);
+    }
+
+    /* Controls table */
+    .controls-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .controls-table th {
+      text-align: left;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--khaki);
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(139, 115, 85, .2);
+    }
+
+    .controls-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(139, 115, 85, .08);
+      color: var(--smoke);
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .controls-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .controls-table tr:hover td {
+      background: rgba(139, 115, 85, .05);
+    }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--sand);
+      background: rgba(196, 168, 122, .1);
+      border: 1px solid rgba(196, 168, 122, .3);
+      border-bottom: 2px solid rgba(196, 168, 122, .4);
+      border-radius: 4px;
+    }
+
+    .key-combo {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ── CODEX ─────────────────────────────────────────────── */
+    .codex-filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-btn {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(139, 115, 85, .3);
+      color: var(--khaki);
+      background: transparent;
+      transition: var(--transition);
+    }
+
+    .filter-btn:hover {
+      border-color: var(--sand);
+      color: var(--sand);
+    }
+
+    .filter-btn.active {
+      background: var(--brass);
+      color: var(--mud);
+      border-color: var(--brass);
+    }
+
+    .codex-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 12px;
+    }
+
+    .codex-card {
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .18);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+
+    .codex-card:hover {
+      border-color: rgba(212, 168, 67, .45);
+      background: var(--dusk);
+      transform: translateY(-2px);
+    }
+
+    .codex-sprite {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-sm);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+
+    .codex-sprite.ally {
+      background: rgba(60, 100, 60, .3);
+      border: 1px solid rgba(80, 160, 80, .25);
+    }
+
+    .codex-sprite.enemy {
+      background: rgba(120, 40, 30, .3);
+      border: 1px solid rgba(180, 60, 40, .25);
+    }
+
+    .codex-sprite.struct {
+      background: rgba(80, 70, 50, .3);
+      border: 1px solid rgba(139, 115, 85, .3);
+    }
+
+    .codex-sprite.item {
+      background: rgba(22, 163, 74, .2);
+      border: 1px solid rgba(22, 163, 74, .3);
+    }
+
+    .codex-name {
+      font-family: var(--font-cond);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .faction-badge {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+
+    .faction-ally {
+      background: rgba(60, 130, 60, .2);
+      color: #7ec87e;
+      border: 1px solid rgba(80, 160, 80, .25);
+    }
+
+    .faction-enemy {
+      background: rgba(140, 50, 30, .2);
+      color: #e07050;
+      border: 1px solid rgba(180, 70, 50, .25);
+    }
+
+    .faction-struct {
+      background: rgba(100, 85, 60, .2);
+      color: var(--sand);
+      border: 1px solid rgba(139, 115, 85, .3);
+    }
+
+    .faction-item {
+      background: rgba(22, 163, 74, .2);
+      color: #86efac;
+      border: 1px solid rgba(22, 163, 74, .3);
+    }
+
+    .stat-mini {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stat-pip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .stat-pip-val {
+      font-family: var(--font-cond);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--sand);
+    }
+
+    .stat-pip-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--khaki);
+    }
+
+    /* Codex Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(10, 8, 5, .85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-box {
+      background: var(--trench);
+      border: 1px solid rgba(212, 168, 67, .25);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      max-width: 460px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      transform: translateY(12px);
+      transition: transform 200ms ease;
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--khaki);
+      background: rgba(139, 115, 85, .1);
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      background: rgba(139, 115, 85, .2);
+      color: var(--white);
+    }
+
+    .modal-sprite-lg {
+      width: 96px;
+      height: 96px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      margin: 0 auto 1.25rem;
+    }
+
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 36px;
+      color: var(--white);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .stat-block {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin: 1.25rem 0;
+      padding: 1rem;
+      background: rgba(26, 22, 16, .5);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(139, 115, 85, .15);
+    }
+
+    .stat-cell {
+      text-align: center;
+    }
+
+    .stat-cell-val {
+      font-family: var(--font-display);
+      font-size: 22px;
+      color: var(--brass);
+    }
+
+    .stat-cell-lbl {
+      font-family: var(--font-cond);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--khaki);
+      margin-top: 2px;
+    }
+
+    .unlock-note {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(212, 168, 67, .08);
+      border: 1px solid rgba(212, 168, 67, .2);
+      font-size: 13px;
+      color: var(--sand);
+      margin-top: 1rem;
+    }
+
+    /* ── TEAM ──────────────────────────────────────────────── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .dev-card {
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .18);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .dev-card:hover {
+      border-color: rgba(212, 168, 67, .3);
+    }
+
+    .dev-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      background: #ffffff;
+      border: 2px solid var(--brass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-cond);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--trench);
+      overflow: hidden;
+    }
+
+    .dev-name {
+      font-family: var(--font-cond);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 4px;
+    }
+
+    .dev-role {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 0.75rem;
+    }
+
+    .dev-bio {
+      font-size: 13px;
+      color: var(--smoke);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .dev-links {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dev-link {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      color: var(--khaki);
+      background: rgba(139, 115, 85, .1);
+      border: 1px solid rgba(139, 115, 85, .2);
+      transition: var(--transition);
+    }
+
+    .dev-link:hover {
+      background: rgba(212, 168, 67, .15);
+      color: var(--brass);
+      border-color: rgba(212, 168, 67, .4);
+    }
+
+    /* ── SIDEBAR ───────────────────────────────────────────── */
+    .sidebar-card {
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .2);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .gcash-card {
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .gcash-qr-placeholder {
+      background: #ffffff;
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .qr-border {
+      border: 2px dashed #3b82f6;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #1a1610;
+    }
+
+    .qr-label {
+      font-family: var(--font-cond);
+      font-weight: 700;
+      color: #3b82f6;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-card-title {
+      font-family: var(--font-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--brass);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .version-badge-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .version-pill {
+      font-family: var(--font-cond);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .build-num {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      color: var(--khaki);
+    }
+
+    .spec-list {
+      list-style: none;
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(139, 115, 85, .1);
+    }
+
+    .spec-item:last-child {
+      border-bottom: none;
+    }
+
+    .spec-icon {
+      font-size: 17px;
+      color: var(--khaki);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .spec-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .spec-lbl {
+      font-family: var(--font-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--khaki);
+      margin-bottom: 1px;
+    }
+
+    .spec-val {
+      font-size: 13px;
+      color: var(--smoke);
+    }
+
+    .req-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-cond);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .req-required {
+      background: rgba(139, 58, 30, .25);
+      color: #e07050;
+      border: 1px solid rgba(139, 58, 30, .4);
+    }
+
+    .req-optional {
+      background: rgba(100, 120, 60, .2);
+      color: #a0c870;
+      border: 1px solid rgba(100, 120, 60, .35);
+    }
+
+    /* Version history */
+    .version-entry {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(139, 115, 85, .1);
+    }
+
+    .version-entry:last-child {
+      border-bottom: none;
+    }
+
+    .version-entry-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .version-str {
+      font-family: var(--font-cond);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--sand);
+    }
+
+    .version-date {
+      font-size: 11px;
+      color: var(--khaki);
+    }
+
+    .version-note {
+      font-size: 12px;
+      color: var(--smoke);
+      line-height: 1.5;
+    }
+
+    .changelog-tag {
+      display: inline-block;
+      font-family: var(--font-cond);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 2px;
+      margin-right: 4px;
+    }
+
+    .ct-added {
+      background: rgba(60, 130, 60, .2);
+      color: #7ec87e;
+    }
+
+    .ct-fixed {
+      background: rgba(60, 90, 150, .2);
+      color: #7090e0;
+    }
+
+    .ct-balance {
+      background: rgba(180, 130, 30, .2);
+      color: var(--brass);
+    }
+
+    .show-all-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brass);
+      padding: 8px 0 0;
+      transition: var(--transition);
+    }
+
+    .show-all-btn:hover {
+      color: var(--sand);
+    }
+
+    /* ── COMMUNITY ─────────────────────────────────────────── */
+    .community-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 2.5rem;
+    }
+
+    .community-link-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 1.5rem 1rem;
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .18);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .community-link-card:hover {
+      border-color: rgba(212, 168, 67, .35);
+      transform: translateY(-2px);
+    }
+
+    .comm-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    .comm-discord {
+      background: rgba(88, 101, 242, .2);
+      color: #7289da;
+    }
+
+    .comm-reddit {
+      background: rgba(255, 69, 0, .15);
+      color: #ff6314;
+    }
+
+    .comm-github {
+      background: rgba(139, 115, 85, .15);
+      color: var(--sand);
+    }
+
+    .comm-name {
+      font-family: var(--font-cond);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .comm-sub {
+      font-size: 12px;
+      color: var(--khaki);
+    }
+
+    .comm-cta {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+
+    /* Feedback form */
+    .feedback-form {
+      background: var(--trench);
+      border: 1px solid rgba(139, 115, 85, .18);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+    }
+
+    .form-title {
+      font-family: var(--font-cond);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-sub {
+      font-size: 14px;
+      color: var(--khaki);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .form-label {
+      font-family: var(--font-cond);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--khaki);
+    }
+
+    .form-control {
+      background: rgba(26, 22, 16, .6);
+      border: 1px solid rgba(139, 115, 85, .25);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--white);
+      width: 100%;
+      transition: border-color var(--transition);
+      appearance: none;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: rgba(212, 168, 67, .5);
+    }
+
+    .form-control::placeholder {
+      color: rgba(139, 115, 85, .5);
+    }
+
+    select.form-control {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b7355' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    select.form-control option {
+      background: var(--trench);
+      color: var(--white);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 1rem;
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--khaki);
+    }
+
+    .toast {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: var(--font-cond);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .toast.success {
+      display: flex;
+      background: rgba(60, 130, 60, .2);
+      border: 1px solid rgba(80, 160, 80, .3);
+      color: #7ec87e;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid rgba(139, 115, 85, .15);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--brass);
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-copy {
+      font-size: 13px;
+      color: var(--khaki);
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .side-col {
+        position: static;
+        order: -1;
+      }
+
+      .side-col .sidebar-card {
+        display: none;
+      }
+
+      .side-col .sidebar-card:first-child {
+        display: block;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-content {
+        padding: 2rem 1.25rem 2.5rem;
+      }
+
+      .page-shell {
+        padding: 0 1.25rem;
+      }
+
+      .two-col {
+        margin-top: 2rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .codex-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition-duration: 0ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ── HERO ──────────────────────────────────────────────────────── -->
+  <section class="hero" aria-label="Game hero banner">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <!-- Trench silhouette -->
+    <svg class="hero-silhouette" viewBox="0 0 1440 160" fill="none" xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true">
+      <path
+        d="M0 160 L0 80 Q80 70 160 80 L220 80 L220 50 Q240 40 260 50 L260 80 Q360 75 480 80 L540 80 L540 45 Q560 35 580 45 L580 80 Q700 78 840 80 L900 80 L900 52 Q920 42 940 52 L940 80 Q1060 76 1200 80 L1260 80 L1260 55 Q1280 45 1300 55 L1300 80 Q1380 78 1440 80 L1440 160 Z"
+        fill="#1a1610" />
+    </svg>
+    <div class="hero-content">
+      <div class="hero-status">Early Access</div>
+      <h1 class="hero-title">WW1-Trench<br><span>Defense</span></h1>
+      <p class="hero-tagline">Hold the line. Manage your resources. Outlast the Enemy's endless advance.</p>
+      <div class="hero-actions">
+        <a href="https://trenchdefense.gamer.gd/" class="btn-primary">
+          <i class="ti ti-player-play" aria-hidden="true"></i> Play Now
+        </a>
+        <a href="#about" class="btn-ghost">
+          <i class="ti ti-book" aria-hidden="true"></i> Read the lore
+        </a>
+      </div>
+    </div>
+    <div class="hero-scroll" aria-hidden="true">
+      <span>Scroll</span>
+      <i class="ti ti-chevron-down"></i>
+    </div>
+  </section>
+  <!-- ── STICKY NAV ────────────────────────────────────────────────── -->
+  <nav class="sticky-nav" aria-label="Page sections">
+    <div class="nav-inner">
+      <a href="#about" class="nav-tab active" data-section="about">About</a>
+      <a href="#mechanics" class="nav-tab" data-section="mechanics">Mechanics</a>
+      <a href="#codex" class="nav-tab" data-section="codex">Codex</a>
+      <a href="#team" class="nav-tab" data-section="team">Team</a>
+      <a href="#community" class="nav-tab" data-section="community">Community</a>
+    </div>
+  </nav>
+  <!-- ── MAIN CONTENT + SIDEBAR ───────────────────────────────────── -->
+  <div class="page-shell">
+    <div class="two-col">
+      <!-- ── MAIN COLUMN ───────────────────────────────────────────── -->
+      <main class="main-col">
+        <!-- ABOUT -->
+        <section class="section" id="about" aria-labelledby="about-heading">
+          <p class="eyebrow">Setting & Story</p>
+          <h2 class="section-title" id="about-heading">About the Game</h2>
+          <div class="divider"></div>
+          <div class="lore-block">
+            <blockquote>
+              "The year is 1914. The Western Front has swallowed three armies and still it hungers."
+            </blockquote>
+          </div>
+          <div class="prose">
+            <p>You are the last field commander of a battered regiment. Your trench is the only thing standing between
+              the enemies' mechanised advance and the supply depot behind the ridge. Every shell crater is a potential
+              firing position. Every minute of quiet is borrowed time.</p>
+            <p>WW1-Trench Defense is a real-time tower defense game set in the mud and blood of the First World War. You
+              build fortifications, deploy specialist soldiers, manage limited ammunition and medical supplies, and
+              adapt to escalating enemy tactics wave by wave.</p>
+            <p>Your objective is to win and survive. Hold for eighteen waves. Don't let a single enemy breach the rear
+              line.</p>
+            <p style="margin-top: 1rem; color: var(--sand);"><strong>What you will gain:</strong> Discover deep
+              historical knowledge about the harsh realities and tactical challenges of trench warfare in 1914. Enjoy
+              immersive, high-stakes entertainment that challenges your strategic planning, quick decision-making, and
+              resource coordination under pressure.</p>
+          </div>
+          <div class="tags">
+            <span class="tag">Strategy</span>
+            <span class="tag">Historical</span>
+            <span class="tag">Tactical</span>
+            <span class="tag">Entertainment</span>
+          </div>
+          <div class="video-frame" role="region" aria-label="Gameplay trailer">
+            <iframe
+              src="https://www.youtube.com/embed/k36j3qxIR-A"
+              title="WW1-Trench Defense Trailer"
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius-md); border: 0;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+          </div>
+        </section>
+        <!-- MECHANICS -->
+        <section class="section" id="mechanics" aria-labelledby="mechanics-heading">
+          <p class="eyebrow">How to Play</p>
+          <h2 class="section-title" id="mechanics-heading">Game Mechanics</h2>
+          <div class="divider"></div>
+          <!-- Accordion 1 -->
+          <div class="accordion-item">
+            <button class="accordion-trigger open" aria-expanded="true" aria-controls="acc-core"
+              onclick="toggleAccordion(this,'acc-core')">
+              <span class="acc-icon" aria-hidden="true"><i class="ti ti-shield-half"></i></span>
+              <span class="acc-title">Core Gameplay</span>
+              <i class="ti ti-chevron-down acc-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="accordion-body open prose" id="acc-core">
+              <div class="prose" style="padding-top:16px;border-top:1px solid rgba(139,115,85,.12)">
+                <p>There is no timed planning phase. You can immediately place your defensive towers right after opening
+                  the game before starting the incoming enemy wave.</p>
+                <p><strong>Resource management</strong> revolves around Gold. A starting amount of Gold is provided,
+                  which you must use wisely to build your initial defense. To earn more Gold and reinforce your line,
+                  you must eliminate advancing enemy units.</p>
+                <p><strong>Base building</strong> (defense building) lets you reinforce trench lines, construct
+                  barriers, and place sandbag redoubts. Structures degrade as they take damage; repairing them costs a
+                  portion of their original Gold value.</p>
+              </div>
+            </div>
+          </div>
+          <!-- Accordion 2 -->
+          <div class="accordion-item">
+            <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-waves"
+              onclick="toggleAccordion(this,'acc-waves')">
+              <span class="acc-icon" aria-hidden="true"><i class="ti ti-wave-square"></i></span>
+              <span class="acc-title">Wave System & Escalation</span>
+              <i class="ti ti-chevron-down acc-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="accordion-body prose" id="acc-waves">
+              <div class="prose" style="padding-top:16px;border-top:1px solid rgba(139,115,85,.12)">
+                <p>Enemies arrive in <strong>18 waves</strong>, divided into 6 waves per chapter. Every 6th wave is a
+                  crucial <strong>boss wave</strong> where elite enemy forces commit their full strength to break your
+                  lines.</p>
+              </div>
+            </div>
+          </div>
+          <!-- Accordion 3 -->
+          <div class="accordion-item">
+            <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-upgrades"
+              onclick="toggleAccordion(this,'acc-upgrades')">
+              <span class="acc-icon" aria-hidden="true"><i class="ti ti-arrow-up-circle"></i></span>
+              <span class="acc-title">Unit Upgrades</span>
+              <i class="ti ti-chevron-down acc-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="accordion-body prose" id="acc-upgrades">
+              <div class="prose" style="padding-top:16px;border-top:1px solid rgba(139,115,85,.12)">
+                <p>There is no passive experience tracking for individual units. Upgrades are entirely in the hands of
+                  the player and can be purchased manually (either in-game during battle or in menu screens) using your
+                  Gold resources.</p>
+                <p>Upgrades directly boost unit capabilities such as fire rate, health, and damage, without restrictive
+                  veteran paths.</p>
+              </div>
+            </div>
+          </div>
+          <!-- Controls table -->
+          <div class="accordion-item">
+            <button class="accordion-trigger" aria-expanded="false" aria-controls="acc-controls"
+              onclick="toggleAccordion(this,'acc-controls')">
+              <span class="acc-icon" aria-hidden="true"><i class="ti ti-keyboard"></i></span>
+              <span class="acc-title">Controls Guide</span>
+              <i class="ti ti-chevron-down acc-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="accordion-body" id="acc-controls">
+              <div style="padding-top:16px;border-top:1px solid rgba(139,115,85,.12)">
+                <table class="controls-table">
+                  <thead>
+                    <tr>
+                      <th>Input</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <div class="key-combo"><kbd>Left Click</kbd></div>
+                      </td>
+                      <td>Select, place towers, or interact with shop/upgrade menus</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="key-combo"><kbd>Right Click</kbd></div>
+                      </td>
+                      <td>Deselect / cancel tower placement</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="key-combo"><kbd>Mouse Move</kbd></div>
+                      </td>
+                      <td>Hover over grid to aim and position defenses</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="key-combo"><kbd>1</kbd><span style="color:var(--khaki)">–</span><kbd>6</kbd></div>
+                      </td>
+                      <td>Keyboard shortcuts to quick-select towers 1 to 6</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="key-combo"><kbd>Esc</kbd></div>
+                      </td>
+                      <td>Pause the game / open settings</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- CODEX -->
+        <section class="section" id="codex" aria-labelledby="codex-heading">
+          <p class="eyebrow">Units & Enemies</p>
+          <h2 class="section-title" id="codex-heading">Codex</h2>
+          <div class="divider"></div>
+          <div class="codex-grid" id="codexGrid" role="list"></div>
+        </section>
+        <!-- TEAM -->
+        <section class="section" id="team" aria-labelledby="team-heading">
+          <p class="eyebrow">Behind the Game</p>
+          <h2 class="section-title" id="team-heading">Meet the Team</h2>
+          <div class="divider"></div>
+          <p class="prose" style="margin-bottom:1.5rem">We're a small team of IT3A students for websystems 101 project.
+          </p>
+          <div class="team-grid" id="teamGrid"></div>
+        </section>
+        <!-- COMMUNITY/FEEDBACK -->
+        <section class="section" id="community" aria-labelledby="community-heading">
+          <p class="eyebrow">Players & Feedback</p>
+          <h2 class="section-title" id="community-heading">Feedback & Support</h2>
+          <div class="divider"></div>
+          <div class="feedback-form" role="region" aria-label="Send feedback">
+            <div class="form-title">Send feedback</div>
+            <p class="form-sub">Bug report, balance suggestion, or just a wave count you're proud of — we read
+              everything.</p>
+            <div id="feedbackToast" class="toast success" role="status" aria-live="polite">
+              <i class="ti ti-circle-check" aria-hidden="true"></i> Report received — thank you, soldier.
+            </div>
+            <form id="feedbackForm" onsubmit="submitFeedback(event)" novalidate>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="fb-category">Category</label>
+                  <select class="form-control" id="fb-category" required>
+                    <option value="" disabled selected>Select type</option>
+                    <option value="bug">Bug report</option>
+                    <option value="balance">Balance issue</option>
+                    <option value="feature">Feature request</option>
+                    <option value="general">General</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="fb-email">Email (optional)</label>
+                  <input class="form-control" id="fb-email" type="email" placeholder="sample1@gmail.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fb-subject">Subject</label>
+                <input class="form-control" id="fb-subject" type="text" placeholder="Brief summary of your feedback"
+                  required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="fb-body">Details</label>
+                <textarea class="form-control" id="fb-body" placeholder="What happened? Which wave? Which browser?"
+                  required></textarea>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary" style="padding:11px 28px;font-size:14px">
+                  <i class="ti ti-send" aria-hidden="true"></i> Send report
+                </button>
+                <span class="form-note">Replies to build v1.4.2</span>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main><!-- /main-col -->
+      <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+      <aside class="side-col" aria-label="Technical information">
+        <div class="sidebar-card gcash-card">
+          <div class="sidebar-card-title" style="color: #3b82f6; display: flex; align-items: center; gap: 6px;">
+            <i class="ti ti-wallet" aria-hidden="true" style="font-size: 16px;"></i> Support the Devs
+          </div>
+          <p style="font-size:12px;color:var(--smoke);margin-bottom:12px;line-height:1.5;">Donate to the devs for
+            further improvements and support our websystems project!</p>
+          <div class="gcash-qr-placeholder">
+            <img src="qr.jpeg" alt="GCash QR Code"
+              style="width: 100%; border-radius: var(--radius-sm); border: 1px solid rgba(59, 130, 246, 0.3);">
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">
+            <i class="ti ti-package" aria-hidden="true"></i> Current version
+          </div>
+          <div class="version-badge-wrap">
+            <span class="version-pill">v1.4.2</span>
+            <span class="build-num">Build #38</span>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--khaki)">Released 14 Jun 2026</div>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">
+            <i class="ti ti-cpu" aria-hidden="true"></i> Technical info
+          </div>
+          <ul class="spec-list" role="list">
+            <li class="spec-item">
+              <i class="ti ti-code spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">Engine</div>
+                <div class="spec-val">Vanilla JS + Canvas API</div>
+              </div>
+            </li>
+            <li class="spec-item">
+              <i class="ti ti-browser spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">Browser</div>
+                <div class="spec-val">Chrome 110+, Firefox 109+, Edge 110+</div>
+              </div>
+            </li>
+            <li class="spec-item">
+              <i class="ti ti-device-desktop spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">Resolution</div>
+                <div class="spec-val">Minimum 1280 × 720</div>
+              </div>
+            </li>
+            <li class="spec-item">
+              <i class="ti ti-3d-cube-sphere spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">WebGL</div>
+                <div class="spec-val" style="margin-top:4px">
+                  <span class="req-badge req-required">
+                    <i class="ti ti-alert-triangle" aria-hidden="true"></i> Required
+                  </span>
+                </div>
+              </div>
+            </li>
+            <li class="spec-item">
+              <i class="ti ti-volume spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">Audio</div>
+                <div class="spec-val" style="margin-top:4px">
+                  <span class="req-badge req-optional">
+                    <i class="ti ti-check" aria-hidden="true"></i> Optional
+                  </span>
+                </div>
+              </div>
+            </li>
+            <li class="spec-item">
+              <i class="ti ti-certificate spec-icon" aria-hidden="true"></i>
+              <div class="spec-info">
+                <div class="spec-lbl">License</div>
+                <div class="spec-val">Free to play</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">
+            <i class="ti ti-clock-history" aria-hidden="true"></i> Version history
+          </div>
+          <div class="version-entry">
+            <div class="version-entry-head">
+              <span class="version-str">v1.4.2</span>
+              <span class="version-date">Jun 14, 2026</span>
+            </div>
+            <div class="version-note">
+              <span class="changelog-tag ct-fixed">Fixed</span>Wave 17 gas attack clipping through sandbags.<br>
+              <span class="changelog-tag ct-balance">Balance</span>Reduced Stosstruppen HP by 8%.
+            </div>
+          </div>
+          <div class="version-entry">
+            <div class="version-entry-head">
+              <span class="version-str">v1.4.0</span>
+              <span class="version-date">May 30, 2026</span>
+            </div>
+            <div class="version-note">
+              <span class="changelog-tag ct-added">Added</span>Flamethrower unit + Bunker structure.<br>
+              <span class="changelog-tag ct-balance">Balance</span>Rifleman Iron cost +5.
+            </div>
+          </div>
+          <div class="version-entry">
+            <div class="version-entry-head">
+              <span class="version-str">v1.3.1</span>
+              <span class="version-date">Apr 12, 2026</span>
+            </div>
+            <div class="version-note">
+              <span class="changelog-tag ct-fixed">Fixed</span>Mobile touch controls on wave start.<br>
+              <span class="changelog-tag ct-added">Added</span>Pressure Meter to HUD.
+            </div>
+          </div>
+          <button class="show-all-btn" onclick="alert('Full version history coming soon.')">
+            <i class="ti ti-history" aria-hidden="true"></i> All versions
+          </button>
+        </div>
+      </aside><!-- /side-col -->
+    </div><!-- /two-col -->
+  </div><!-- /page-shell -->
+  <!-- ── CODEX MODAL ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="codexModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
+    onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModalDirect()" aria-label="Close codex entry">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+      <div class="modal-sprite-lg" id="modalSprite"></div>
+      <div id="modalFaction" style="text-align:center;margin-bottom:8px"></div>
+      <h3 class="modal-title" id="modalTitle"></h3>
+      <div class="stat-block" id="modalStats"></div>
+      <div class="prose" id="modalDesc" style="font-size:14px"></div>
+      <div class="unlock-note" id="modalUnlock" style="display:none">
+        <i class="ti ti-lock-open" aria-hidden="true"></i>
+        <span id="modalUnlockText"></span>
+      </div>
+    </div>
+  </div>
+  <!-- ── FOOTER ────────────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">WW1-Trench Defense</div>
+      <p class="footer-copy">© 2026 Mud & Wire Games. Built with JavaScript and stubbornness. No AI units were harmed in
+        the making of this game.</p>
+    </div>
+  </footer>
+  <!-- ── DATA & SCRIPTS ────────────────────────────────────────────── -->
+  <script>
+    /* ── CODEX DATA ─────────────────────────────────────────── */
+    const codexData = [
+      // Towers (Defenders)
+      { id: 1, type: 'struct', name: 'Machine Gun Nest', faction: 'Structures', sprite: '🔫', emoji: '🔫', desc: 'Rapid-fire suppression. Low damage per shot but high sustained DPS. Best against light infantry.', stats: { HP: 160, DMG: 14, RNG: '3.2', COST: 50 }, unlock: null },
+      { id: 2, type: 'struct', name: 'Mortar Station', faction: 'Structures', sprite: '💣', emoji: '💣', desc: 'Lobs explosive shells in an arc. Area-of-effect damage — excellent against grouped enemies.', stats: { HP: 130, DMG: 65, RNG: '4.5', COST: 120 }, unlock: null },
+      { id: 3, type: 'struct', name: 'Sniper Post', faction: 'Structures', sprite: '🎯', emoji: '🎯', desc: 'Long-range precision fire. Low fire rate but massive single-target damage. 20% headshot crit (x2.5 damage).', stats: { HP: 100, DMG: 105, RNG: '6.5', COST: 100 }, unlock: null },
+      { id: 4, type: 'struct', name: 'Barbed Wire', faction: 'Structures', sprite: '〰️', emoji: '〰️', desc: 'Passive obstacle. Slows enemies passing within 1.5 tiles by 60%. No attack. Cheap to deploy.', stats: { HP: 85, DMG: 0, RNG: '1.5', COST: 30 }, unlock: null },
+      { id: 5, type: 'struct', name: 'Artillery Battery', faction: 'Structures', sprite: '💥', emoji: '💥', desc: 'Heavy field gun. Massive AoE shell. Devastates everything in a wide radius. Slow and expensive.', stats: { HP: 190, DMG: 130, RNG: '7.5', COST: 200 }, unlock: null },
+      { id: 6, type: 'struct', name: 'Gas Launcher', faction: 'Structures', sprite: '☁️', emoji: '☁️', desc: 'Fires poison gas canisters. Low direct damage but applies 4-second poison DoT (8 DPS). Ignores armor.', stats: { HP: 105, DMG: '8/s', RNG: '3.0', COST: 80 }, unlock: null },
+
+      // Enemies (Kaiser Army)
+      { id: 7, type: 'enemy', name: 'Infantry', faction: 'Kaiser Army', sprite: '🪖', emoji: '🪖', desc: 'Standard foot soldiers. Weak individually, dangerous in numbers.', stats: { HP: 80, SPD: 62, REWARD: 10 }, unlock: null },
+      { id: 8, type: 'enemy', name: 'Stormtrooper', faction: 'Kaiser Army', sprite: '⚔️', emoji: '⚔️', desc: 'Fast and armored. Elite infantry trained for infiltration attacks.', stats: { HP: 130, SPD: 88, REWARD: 20 }, unlock: null },
+      { id: 9, type: 'enemy', name: 'Heavy Gunner', faction: 'Kaiser Army', sprite: '🛡️', emoji: '🛡️', desc: 'Slow but heavily armored. Absorbs significant punishment.', stats: { HP: 260, SPD: 42, REWARD: 30 }, unlock: null },
+      { id: 10, type: 'enemy', name: 'Cavalry', faction: 'Kaiser Army', sprite: '🐎', emoji: '🐎', desc: 'Very fast mounted soldiers. Hard to hit. Low HP.', stats: { HP: 110, SPD: 145, REWARD: 25 }, unlock: null },
+      { id: 11, type: 'enemy', name: 'Field Officer', faction: 'Kaiser Army', sprite: '⭐', emoji: '⭐', desc: 'Commands nearby troops. Enemies within 2.5 tiles move 30% faster and take 15% less damage.', stats: { HP: 160, SPD: 70, REWARD: 50 }, unlock: null },
+      { id: 12, type: 'enemy', name: 'Panzer', faction: 'Kaiser Army', sprite: '🚂', emoji: '🚂', desc: 'BOSS UNIT. Heavy armored vehicle. Virtually immune to single-target fire. Focus artillery and AoE.', stats: { HP: 1200, SPD: 28, REWARD: 100 }, unlock: null },
+      { id: 13, type: 'enemy', name: 'Enemy Sniper', faction: 'Kaiser Army', sprite: '🎯', emoji: '🎯', desc: 'Slow-moving sharpshooter. Fires back at your towers. Eliminate quickly before they destroy your fortifications.', stats: { HP: 78, SPD: 36, REWARD: 35 }, unlock: null },
+
+      // Shop Supplies (items)
+      { id: 14, type: 'item', name: 'Emergency Repair', faction: 'Shop Supplies', sprite: '🔧', emoji: '🔧', desc: 'Restore all towers to full HP instantly.', stats: { COST: 60 }, unlock: null },
+      { id: 15, type: 'item', name: 'Supply Cache', faction: 'Shop Supplies', sprite: '🪙', emoji: '🪙', desc: 'Receive an emergency supply of +80 Gold.', stats: { COST: 40 }, unlock: null },
+      { id: 16, type: 'item', name: 'Chlorine Freeze', faction: 'Shop Supplies', sprite: '❄️', emoji: '❄️', desc: 'Freeze all enemies on the field for 3 seconds.', stats: { COST: 75 }, unlock: null },
+      { id: 17, type: 'item', name: 'Artillery Barrage', faction: 'Shop Supplies', sprite: '💥', emoji: '💥', desc: 'Call a massive barrage — deal 200 damage to all enemies.', stats: { COST: 120 }, unlock: null },
+      { id: 18, type: 'item', name: 'Reinforcements', faction: 'Shop Supplies', sprite: '⚔️', emoji: '⚔️', desc: 'Send 2 friendly soldiers onto the field for 15 seconds.', stats: { COST: 90 }, unlock: null },
+      { id: 19, type: 'item', name: 'Field Hospital', faction: 'Shop Supplies', sprite: '❤️', emoji: '❤️', desc: 'Restore 2 lives. A desperate measure.', stats: { COST: 100 }, unlock: null }
+    ];
+
+    /* ── TEAM DATA ──────────────────────────────────────────── */
+    const teamData = [
+      { name: 'DAN LESTER OLAVE', image: 'OLAVE.png', role: 'Lead Developer & Backend Programmer', bio: 'Developed the core game architecture, wave generation algorithm, and state synchronization.' },
+      { name: 'ELEXIS EON CLARK MANHIC', image: 'Manhic.jpg', role: 'Frontend Developer & UI-UX Designer', bio: 'Crafted the responsive interface layouts, visual styles, and user interaction flows.' },
+      { name: 'RONALD CLARENCE OLIVEROS', image: 'Oliveros.png', role: 'Database Administrator & Quality Assurance', bio: 'Designed the database schema, integrated the leaderboard API, and managed testing pipelines.' }
+    ];
+
+    /* ── RENDER CODEX ───────────────────────────────────────── */
+    function renderCodex() {
+      const grid = document.getElementById('codexGrid');
+      grid.innerHTML = '';
+      codexData.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'codex-card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', entry.name + ' — click for details');
+
+        let factionClass = 'faction-struct';
+        let spriteClass = 'struct';
+        if (entry.type === 'enemy') {
+          factionClass = 'faction-enemy';
+          spriteClass = 'enemy';
+        } else if (entry.type === 'item') {
+          factionClass = 'faction-item';
+          spriteClass = 'item';
+        }
+
+        let visibleStats = '';
+        if (entry.type === 'struct') {
+          visibleStats = `<div class="stat-pip"><div class="stat-pip-val">${entry.stats.HP}</div><div class="stat-pip-lbl">HP</div></div><div class="stat-pip"><div class="stat-pip-val">${entry.stats.COST}</div><div class="stat-pip-lbl">Gold</div></div>`;
+        } else if (entry.type === 'item') {
+          visibleStats = `<div class="stat-pip"><div class="stat-pip-val">${entry.stats.COST}</div><div class="stat-pip-lbl">Gold</div></div>`;
+        } else if (entry.type === 'enemy') {
+          visibleStats = `<div class="stat-pip"><div class="stat-pip-val">${entry.stats.HP}</div><div class="stat-pip-lbl">HP</div></div><div class="stat-pip"><div class="stat-pip-val">${entry.stats.SPD}</div><div class="stat-pip-lbl">SPD</div></div><div class="stat-pip"><div class="stat-pip-val">${entry.stats.REWARD}</div><div class="stat-pip-lbl">Gold</div></div>`;
+        }
+
+        card.innerHTML = `
+      <div class="codex-sprite ${spriteClass}" aria-hidden="true">${entry.emoji}</div>
+      <div class="codex-name">${entry.name}</div>
+      <div><span class="faction-badge ${factionClass}">${entry.faction.split(' ')[0]}</span></div>
+      <div class="stat-mini">${visibleStats}</div>`;
+        card.addEventListener('click', () => openModal(entry));
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openModal(entry); });
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── RENDER TEAM ────────────────────────────────────────── */
+    function renderTeam() {
+      const grid = document.getElementById('teamGrid');
+      teamData.forEach(dev => {
+        const card = document.createElement('div');
+        card.className = 'dev-card';
+        card.innerHTML = `
+      <div class="dev-avatar" aria-hidden="true" style="padding: 0; overflow: hidden; background: none;">
+        <img src="${dev.image}" alt="${dev.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+      </div>
+      <div class="dev-name">${dev.name}</div>
+      <div class="dev-role">${dev.role}</div>
+      <div class="dev-bio">${dev.bio}</div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ── MODAL ──────────────────────────────────────────────── */
+    function openModal(entry) {
+      const modal = document.getElementById('codexModal');
+      let spriteClass = 'struct';
+      if (entry.type === 'enemy') spriteClass = 'enemy';
+      if (entry.type === 'item') spriteClass = 'item';
+
+      document.getElementById('modalSprite').className = `modal-sprite-lg ${spriteClass}`;
+      document.getElementById('modalSprite').textContent = entry.emoji;
+      document.getElementById('modalTitle').textContent = entry.name;
+
+      let factionClass = 'faction-struct';
+      if (entry.type === 'enemy') factionClass = 'faction-enemy';
+      if (entry.type === 'item') factionClass = 'faction-item';
+
+      document.getElementById('modalFaction').innerHTML = `<span class="faction-badge ${factionClass}">${entry.faction}</span>`;
+      document.getElementById('modalDesc').textContent = entry.desc;
+
+      document.getElementById('modalStats').innerHTML = Object.entries(entry.stats).map(([k, v]) =>
+        `<div class="stat-cell"><div class="stat-cell-val">${v}</div><div class="stat-cell-lbl">${k}</div></div>`
+      ).join('');
+
+      const unlockEl = document.getElementById('modalUnlock');
+      const unlockTx = document.getElementById('modalUnlockText');
+      if (entry.unlock) {
+        unlockEl.style.display = 'flex';
+        unlockTx.textContent = entry.unlock;
+      } else {
+        unlockEl.style.display = 'none';
+      }
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(e) {
+      if (e.target === document.getElementById('codexModal')) closeModalDirect();
+    }
+    function closeModalDirect() {
+      document.getElementById('codexModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModalDirect();
+    });
+    /* ── ACCORDION ──────────────────────────────────────────── */
+    function toggleAccordion(trigger, bodyId) {
+      const body = document.getElementById(bodyId);
+      const isOpen = body.classList.toggle('open');
+      trigger.classList.toggle('open', isOpen);
+      trigger.setAttribute('aria-expanded', isOpen);
+    }
+    /* ── SCROLL SPY ─────────────────────────────────────────── */
+    const sections = ['about', 'mechanics', 'codex', 'team', 'community'];
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navTabs.forEach(t => t.classList.remove('active'));
+          const active = document.querySelector(`.nav-tab[data-section="${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    /* ── FEEDBACK FORM ──────────────────────────────────────── */
+    function submitFeedback(e) {
+      e.preventDefault();
+      const category = document.getElementById('fb-category').value;
+      const email = document.getElementById('fb-email').value;
+      const subject = document.getElementById('fb-subject').value;
+      const body = document.getElementById('fb-body').value;
+
+      const mailtoUrl = `mailto:trenchdefenseproject@gmail.com?subject=[Trench Defense Feedback - ${category}] ${encodeURIComponent(subject)}&body=From: ${encodeURIComponent(email)}%0A%0A${encodeURIComponent(body)}`;
+      window.location.href = mailtoUrl;
+
+      const toast = document.getElementById('feedbackToast');
+      const form = document.getElementById('feedbackForm');
+      toast.style.display = 'flex';
+      form.reset();
+      setTimeout(() => { toast.style.display = 'none'; }, 5000);
+    }
+    /* ── INIT ───────────────────────────────────────────────── */
+    renderCodex();
+    renderTeam();
+  </script>
+</body>
+
+</html>
